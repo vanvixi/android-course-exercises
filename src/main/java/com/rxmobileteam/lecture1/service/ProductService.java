@@ -1,11 +1,11 @@
 package com.rxmobileteam.lecture1.service;
 
 import com.rxmobileteam.lecture1.data.ProductDao;
-import com.rxmobileteam.utils.ExerciseNotCompletedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -40,6 +40,14 @@ public class ProductService {
      * @return a list of found products
      */
     public List<Product> searchProducts(String query) {
-        return new ArrayList<>(productDao.findAll());
+        final Set<Product> productSet = productDao.findAll();
+
+        if (query == null || query.isEmpty()) {
+            return new ArrayList<>(productSet);
+        }
+
+        return productSet.stream().filter(
+            p -> p.getName().contains(query) || p.getDescription().contains(query)
+        ).collect(Collectors.toList());
     }
 }

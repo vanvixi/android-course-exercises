@@ -25,11 +25,7 @@ public class ProductDao implements IProductDao {
      */
     @Override
     public boolean add(@NotNull Product product) {
-        try {
-            return products.add(product);
-        } catch (Exception e) {
-            return false;
-        }
+        return products.add(product);
     }
 
     /**
@@ -39,6 +35,6 @@ public class ProductDao implements IProductDao {
      */
     @Override
     public Set<Product> findAll() {
-        return products;
+        return new HashSet<>(products);
     }
 }
