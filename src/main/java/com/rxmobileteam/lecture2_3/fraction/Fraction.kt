@@ -7,7 +7,7 @@ class Fraction private constructor(
   val numerator: Int,
   val denominator: Int,
 ) : Comparable<Fraction> {
-  val decimal: Double = numerator.toDouble() / denominator;
+  val decimal: Double = numerator.toDouble() / denominator
 
   init {
     if (denominator == 0) {
