@@ -1,109 +1,127 @@
 package com.rxmobileteam.lecture2_3.fraction
 
-import com.rxmobileteam.utils.ExerciseNotCompletedException
+import java.security.InvalidParameterException
+import kotlin.math.round
 
 class Fraction private constructor(
   val numerator: Int,
   val denominator: Int,
 ) : Comparable<Fraction> {
-  // TODO: Implement the decimal value of the fraction
-  val decimal: Double = throw ExerciseNotCompletedException()
+  val decimal: Double = numerator.toDouble() / denominator;
 
   init {
-    // TODO: Check validity of numerator and denominator (throw an exception if invalid)
-    throw ExerciseNotCompletedException()
+    if (denominator == 0) {
+      throw InvalidParameterException("Denominator cannot be 0")
+    }
   }
 
   //region unary operators
-  // TODO: "+fraction" operator
-  operator fun unaryPlus(): Fraction = throw ExerciseNotCompletedException()
+  operator fun unaryPlus(): Fraction = Fraction(numerator + denominator, denominator)
 
-  // TODO: "-fraction" operator
-  operator fun unaryMinus(): Fraction = throw ExerciseNotCompletedException()
+  operator fun unaryMinus(): Fraction = Fraction(numerator - denominator, denominator)
   //endregion
 
   //region plus operators
-  // TODO: "fraction+fraction" operator
-  operator fun plus(other: Fraction): Fraction = throw ExerciseNotCompletedException()
+  operator fun plus(other: Fraction): Fraction =
+    Fraction((numerator * other.denominator + other.numerator * denominator), denominator * other.denominator)
 
-  // TODO: "fraction+number" operator
-  operator fun plus(other: Int): Fraction = throw ExerciseNotCompletedException()
+  operator fun plus(other: Int): Fraction = Fraction(numerator + other * denominator, denominator)
   //endregion
 
   //region times operators
-  // TODO: "fraction*fraction" operator
-  operator fun times(other: Fraction): Fraction = throw ExerciseNotCompletedException()
+  operator fun times(other: Fraction): Fraction = Fraction(numerator * other.numerator, denominator * other.denominator)
 
-  // TODO: "fraction*number" operator
-  operator fun times(number: Int): Fraction = throw ExerciseNotCompletedException()
+  operator fun times(number: Int): Fraction = Fraction(numerator * number, denominator)
   //endregion
 
-  // TODO: Compare two fractions
-  override fun compareTo(other: Fraction): Int = throw ExerciseNotCompletedException()
+  override fun compareTo(other: Fraction): Int {
+    if (decimal == other.decimal) return 0
+
+    if (decimal < other.decimal) return -1
+
+    return 1
+  }
 
   //region toString, hashCode, equals, copy
-  // TODO: Format the fraction as a string (e.g. "1/2")
-  override fun toString(): String = throw ExerciseNotCompletedException()
+  override fun toString(): String = decimal.toString()
 
-  // TODO: Implement hashCode
-  override fun hashCode(): Int = throw ExerciseNotCompletedException()
+  override fun hashCode(): Int {
+    var result: Int = numerator.hashCode()
+    result = 31 * result + denominator.hashCode()
 
-  // TODO: Implement equals
-  override fun equals(other: Any?): Boolean = throw ExerciseNotCompletedException()
+    return result
+  }
 
-  // TODO: Implement copy
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other == null || javaClass != other.javaClass) return false
+
+    val fraction = other as Fraction
+
+    if (compareTo(fraction) != 0) return false
+    if (numerator != fraction.numerator) return false
+    return denominator == fraction.denominator
+  }
+
   fun copy(
     numerator: Int = this.numerator,
     denominator: Int = this.denominator
-  ): Fraction = throw ExerciseNotCompletedException()
+  ): Fraction = Fraction(numerator, denominator)
   //endregion
 
   companion object {
     @JvmStatic
-    fun ofInt(number: Int): Fraction {
-      // TODO: Returns a fraction from an integer number
-      throw ExerciseNotCompletedException()
-    }
+    fun ofInt(number: Int): Fraction = Fraction(number, 1)
 
     @JvmStatic
     fun of(numerator: Int, denominator: Int): Fraction {
-      // TODO: Check validity of numerator and denominator
-      // TODO: Simplify fraction using the greatest common divisor
-      // TODO: Finally, return the fraction with the correct values
-      throw ExerciseNotCompletedException()
+      if (denominator == 0) {
+        throw InvalidParameterException("Denominator cannot be 0")
+      }
+
+      val gcd = gcd(numerator, denominator)
+
+      val reducedNumerator = numerator / gcd
+      val reducedDenominator = denominator / gcd
+
+      return Fraction(reducedNumerator, reducedDenominator)
+    }
+
+    private fun gcd(a: Int, b: Int): Int {
+      if (b == 0) {
+        return a
+      }
+      return gcd(b, a % b)
     }
   }
 }
 
-// TODO: return a Fraction representing "this/denominator"
-infix fun Int.over(denominator: Int): Fraction = throw ExerciseNotCompletedException()
+infix fun Int.over(denominator: Int): Fraction = Fraction.of(this, denominator)
 
 //region get extensions
-// TODO: get the numerator, eg. "val (numerator) = Fraction.of(1, 2)"
-operator fun Fraction.component1(): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.component1(): Int = numerator
 
-// TODO: get the denominator, eg. "val (_, denominator) = Fraction.of(1, 2)"
-operator fun Fraction.component2(): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.component2(): Int = denominator
 
-// TODO: get the decimal, index must be 0 or 1
-// TODO: eg. "val numerator = Fraction.of(1, 2)[0]"
-// TODO: eg. "val denominator = Fraction.of(1, 2)[1]"
-// TODO: eg. "val denominator = Fraction.of(1, 2)[2]" should throw an exception
-operator fun Fraction.get(index: Int): Int = throw ExerciseNotCompletedException()
+operator fun Fraction.get(index: Int): Int {
+  if (index < 0 || index > 1) {
+    throw IndexOutOfBoundsException("Index $index is out of bounds")
+  }
+
+  if (index == 0) return component1()
+
+  return component2()
+}
 //endregion
 
 //region to number extensions
-// TODO: round to the nearest integer
-fun Fraction.roundToInt(): Int = throw ExerciseNotCompletedException()
+fun Fraction.roundToInt(): Int = round(decimal).toInt()
 
-// TODO: round to the nearest long
-fun Fraction.roundToLong(): Long = throw ExerciseNotCompletedException()
+fun Fraction.roundToLong(): Long = round(decimal).toLong()
 
-// TODO: return the decimal value as a float
-fun Fraction.toFloat(): Float = throw ExerciseNotCompletedException()
+fun Fraction.toFloat(): Float = decimal.toFloat()
 
-// TODO: return the decimal value as a double
-fun Fraction.toDouble(): Double = throw ExerciseNotCompletedException()
+fun Fraction.toDouble(): Double = decimal
 //endregion
 
 fun main() {
